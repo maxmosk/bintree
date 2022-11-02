@@ -13,6 +13,25 @@ typedef struct treeNode_t_
     treeData_t data;
 } treeNode_t;
 
+typedef int treeStatus_t;
+
+typedef struct
+{
+    treeNode_t *root;
+    treeStatus_t status;
+} tree_t;
+
+
+enum TREE_CODES
+{
+    TREE_SUCCESS = 0,
+    TREE_ERROR   = 1,
+    TREE_NULLPTR = 2
+};
+
+
+enum TREE_CODES treeCtor(tree_t *tree);
+
 
 #endif /* BINTREE_H_INCLUDED__ */
 
