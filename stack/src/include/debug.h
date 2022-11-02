@@ -61,6 +61,11 @@ do                                                               \
 }                                                                     \
 while (0)
 #else
+
+#define LOGOPEN(logfile_) do {} while (0)
+#define LOGCLOSE() do {} while (0)
+#define LOGPRINTF(...) do {} while (0)
+
 #endif
 
 

@@ -7,15 +7,15 @@
 
 
 
-#define ELEM_POISON NAN
-#define IS_ELEM_POISON isnan
+#define ELEM_POISON NULL
+#define IS_ELEM_POISON(elem) (ELEM_POISON == (elem))
 
 #define COLORFULL
 
-#define PRINTELEM(PFILE, ELEM) fprintf(PFILE, "%lg", ELEM)
+#define PRINTELEM(PFILE, ELEM) fprintf(PFILE, "%p", (void *) ELEM)
 
 
-typedef double elem_t;
+typedef char *elem_t;
 
 
 

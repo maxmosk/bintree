@@ -91,6 +91,9 @@ typedef struct
     const char *file;
     const char *func;
 } stack_info_t;
+
+#else
+#define LOGPRINTELEM(ELEM) do {} while (0)
 #endif /* NDEBUG_LOG */
 
 
