@@ -27,13 +27,16 @@ enum TREE_CODES
 {
     TREE_SUCCESS = 0,
     TREE_ERROR   = 1,
-    TREE_NULLPTR = 2
+    TREE_NULLPTR = 2,
+    TREE_NOMEM   = 3
 };
 
 
 enum TREE_CODES treeCtor(tree_t *tree);
 
 bool treeEmpty(const tree_t *tree);
+
+enum TREE_CODES treeInsert(tree_t *tree, treeData_t elem);
 
 
 #endif /* BINTREE_H_INCLUDED__ */
