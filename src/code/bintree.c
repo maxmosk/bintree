@@ -2,12 +2,18 @@
 #include "debug.h"
 
 
+const size_t stackInitSize = 10;
+
+
 enum TREE_CODES treeCtor(tree_t *tree)
 {
     CHECK(NULL != tree, TREE_NULLPTR);
 
     tree->root = NULL;
     tree->status = 0;
+    tree->level = 0;
+
+    CHECK(STACK_SUCCESS == stackCtor(&tree->stack, stackInitSize), TREE_STACKERR);
 
     return TREE_SUCCESS;
 }

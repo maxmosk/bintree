@@ -18,6 +18,8 @@ typedef int treeStatus_t;
 
 typedef struct
 {
+    stack_t stack;
+    size_t level;
     treeNode_t *root;
     treeStatus_t status;
 } tree_t;
@@ -25,10 +27,11 @@ typedef struct
 
 enum TREE_CODES
 {
-    TREE_SUCCESS = 0,
-    TREE_ERROR   = 1,
-    TREE_NULLPTR = 2,
-    TREE_NOMEM   = 3
+    TREE_SUCCESS  = 0,
+    TREE_ERROR    = 1,
+    TREE_NULLPTR  = 2,
+    TREE_NOMEM    = 3,
+    TREE_STACKERR = 4
 };
 
 
