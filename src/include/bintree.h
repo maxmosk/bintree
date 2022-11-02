@@ -2,6 +2,7 @@
 #define BINTREE_H_INCLUDED__
 
 
+#include <stdbool.h>
 #include "bintree_settings.h"
 #include "stack.h"
 
@@ -31,6 +32,8 @@ enum TREE_CODES
 
 
 enum TREE_CODES treeCtor(tree_t *tree);
+
+bool treeEmpty(const tree_t *tree);
 
 
 #endif /* BINTREE_H_INCLUDED__ */

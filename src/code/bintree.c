@@ -12,3 +12,10 @@ enum TREE_CODES treeCtor(tree_t *tree)
     return TREE_SUCCESS;
 }
 
+bool treeEmpty(const tree_t *tree)
+{
+    CHECK(NULL != tree, true);
+
+    return NULL == tree->root;
+}
+
