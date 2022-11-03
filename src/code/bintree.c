@@ -9,6 +9,8 @@ static const char gvizbuf[] = "gvizbuffer";
 
 static void treeGraph(const tree_t *tree, const char *filename);
 
+static void treeGraphAddNode(const treeNode_t *node, FILE *file);
+
 
 enum TREE_CODES treeCtor(tree_t *tree)
 {
@@ -134,9 +136,9 @@ enum TREE_CODES treeVerify(tree_t *tree)
 
     static size_t ngraphs = 0;
     char namebuf[64] = "";
-    sprintf(namebuf, "graph%zu.jpg", ngraphs);
+    sprintf(namebuf, "graph%zu.jpg", ngraphs++);
 
-    LOGOPEN("tree.log");
+    LOGOPEN("tree.html");
     LOGPRINTF("<pre>\n");
     LOGPRINTF("tree_t [%p]\n", (void *) tree);
     LOGPRINTF("{\n");
@@ -163,12 +165,43 @@ static void treeGraph(const tree_t *tree, const char *filename)
     fprintf(dotfile, "digraph\n");
     fprintf(dotfile, "{\n");
 
+    if (NULL != tree->root)
+    {
+        treeGraphAddNode(tree->root, dotfile);
+    }
 
-    fprintf(dotfile, "}");
+    fprintf(dotfile, "}\n");
     fclose(dotfile);
 
     char cmdbuf[128] = "";
     sprintf(cmdbuf, "dot %s -o %s -Tjpg", gvizbuf, filename);
     CHECK(0 == system(cmdbuf), ;);
+}
+
+static void treeGraphAddNode(const treeNode_t *node, FILE *file)
+{
+    if (NULL == node)
+    {
+        return;
+    }
+    else
+    {
+        fprintf(file, "NODE%p[style=\"rounded\",shape=record,color=\"blue\",label="
+                        "\" <left> left=%p | data=%s | <right> right=%p\"];\n",
+                        (void *) node, (void *) node->left, node->data, (void *) node->right);
+
+        if (NULL != node->left)
+        {
+            fprintf(file, "NODE%p:left->NODE%p;", (void *) node, (void *) node->left);
+        }
+
+        if (NULL != node->right)
+        {
+            fprintf(file, "NODE%p:right->NODE%p;", (void *) node, (void *) node->right);
+        }
+    }
+
+    treeGraphAddNode(node->left, file);
+    treeGraphAddNode(node->right, file);
 }
 
