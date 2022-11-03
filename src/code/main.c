@@ -10,12 +10,18 @@ enum MODES
     ERROR      = 3
 };
 
+enum CODES
+{
+    SUCCESS    = 0,
+    WRONG_MODE = 1
+};
+
 
 enum MODES getMode(void);
 
-void play(void);
+enum CODES play(void);
 
-void akinator(tree_t *data);
+enum CODES akinator(tree_t *data);
 
 
 int main(void)
@@ -26,7 +32,7 @@ int main(void)
 }
 
 
-void play(void)
+enum CODES play(void)
 {
     tree_t data = {0};
     treeCtor(&data);
@@ -34,7 +40,7 @@ void play(void)
     enum MODES mode = ERROR;
     if ((mode = getMode()) == ERROR)
     {
-        return;
+        return WRONG_MODE;
     }
 
     switch (mode)
@@ -51,10 +57,12 @@ void play(void)
 
         default:
             printf("Undefined mode\n");
-            return;
+            return WRONG_MODE;
     }
 
     treeDtor(&data);
+
+    return SUCCESS;
 }
 
 enum MODES getMode(void)
@@ -83,7 +91,7 @@ enum MODES getMode(void)
     return ERROR;
 }
 
-void akinator(tree_t *data)
+enum CODES akinator(tree_t *data)
 {
 }
 
