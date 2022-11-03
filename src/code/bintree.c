@@ -11,13 +11,14 @@ static void treeGraph(const tree_t *tree, const char *filename);
 
 static void treeGraphAddNode(const treeNode_t *node, FILE *file);
 
+static void treeNodeDtor(treeNode_t *node);
+
 
 enum TREE_CODES treeCtor(tree_t *tree)
 {
     CHECK(NULL != tree, TREE_NULLPTR);
 
     tree->root = NULL;
-    tree->status = 0;
     tree->level = 0;
 
     CHECK(STACK_SUCCESS == stackCtor(&tree->stack, stackInitSize), TREE_STACKERR);
@@ -130,7 +131,7 @@ enum TREE_CODES treePrev(tree_t *tree)
     return TREE_SUCCESS;
 }
 
-enum TREE_CODES treeVerify(tree_t *tree)
+enum TREE_CODES treeVerify(const tree_t *tree)
 {
     CHECK(NULL != tree, TREE_NULLPTR);
 
@@ -140,7 +141,7 @@ enum TREE_CODES treeVerify(tree_t *tree)
 
     LOGOPEN("tree.html");
     LOGPRINTF("<pre>\n");
-    LOGPRINTF("tree_t [%p]\n", (void *) tree);
+    LOGPRINTF("tree_t [%p]\n", (const void *) tree);
     LOGPRINTF("{\n");
     LOGPRINTF("    root = %p\n", (void *) tree->root);
     LOGPRINTF("    level = %zu\n", tree->level);
@@ -194,17 +195,43 @@ static void treeGraphAddNode(const treeNode_t *node, FILE *file)
 
         if (NULL != node->left)
         {
-            fprintf(file, "NODE%p:left->NODE%p;\n", (const void *) node,
+            fprintf(file, "NODE%p:left->NODE%p[color=\"blue\"];\n", (const void *) node,
                                                 (const void *) node->left);
         }
 
         if (NULL != node->right)
         {
-            fprintf(file, "NODE%p:right->NODE%p;\n", (void *) node, (void *) node->right);
+            fprintf(file, "NODE%p:right->NODE%p[color=\"red\"];\n", (const void *) node,
+                                                (const void *) node->right);
         }
     }
 
     treeGraphAddNode(node->left, file);
     treeGraphAddNode(node->right, file);
+}
+
+enum TREE_CODES treeDtor(tree_t *tree)
+{
+    enum TREE_CODES verify = TREE_ERROR;
+    CHECK(TREE_SUCCESS == (verify = treeVerify(tree)), false);
+    
+    CHECK(STACK_SUCCESS == stackDtor(&tree->stack), TREE_STACKERR);
+    treeNodeDtor(tree->root);
+    tree->root = NULL;
+    tree->level = SIZE_MAX;
+
+    return TREE_SUCCESS;
+}
+
+static void treeNodeDtor(treeNode_t *node)
+{
+    if (NULL == node)
+    {
+        return;
+    }
+
+    treeNodeDtor(node->right);
+    treeNodeDtor(node->left);
+    free(node);
 }
 

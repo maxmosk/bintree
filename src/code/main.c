@@ -12,6 +12,8 @@ int main(void)
     treeInsert(&tree, LEFT_CHILD, "789");
     treeNext(&tree, LEFT_CHILD);
 
+    treeDtor(&tree);
+
     return 0;
 }
 

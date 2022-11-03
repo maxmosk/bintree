@@ -14,14 +14,12 @@ typedef struct treeNode_t_
     treeData_t data;
 } treeNode_t;
 
-typedef int treeStatus_t;
 
 typedef struct
 {
     stack_t stack;
     size_t level;
     treeNode_t *root;
-    treeStatus_t status;
 } tree_t;
 
 
@@ -54,7 +52,9 @@ enum TREE_CODES treeNext(tree_t *tree, const enum CHILD_CODE child);
 
 enum TREE_CODES treePrev(tree_t *tree);
 
-enum TREE_CODES treeVerify(tree_t *tree);
+enum TREE_CODES treeVerify(const tree_t *tree);
+
+enum TREE_CODES treeDtor(tree_t *tree);
 
 
 #endif /* BINTREE_H_INCLUDED__ */
