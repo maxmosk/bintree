@@ -167,6 +167,7 @@ static void treeGraph(const tree_t *tree, const char *filename)
 
     if (NULL != tree->root)
     {
+        fprintf(dotfile, "root->NODE%p\n", (const void *) tree->root);
         treeGraphAddNode(tree->root, dotfile);
     }
 
@@ -188,16 +189,18 @@ static void treeGraphAddNode(const treeNode_t *node, FILE *file)
     {
         fprintf(file, "NODE%p[style=\"rounded\",shape=record,color=\"blue\",label="
                         "\" <left> left=%p | data=%s | <right> right=%p\"];\n",
-                        (void *) node, (void *) node->left, node->data, (void *) node->right);
+                        (const void *) node, (const void *) node->left, node->data,
+                        (const void *) node->right);
 
         if (NULL != node->left)
         {
-            fprintf(file, "NODE%p:left->NODE%p;", (void *) node, (void *) node->left);
+            fprintf(file, "NODE%p:left->NODE%p;\n", (const void *) node,
+                                                (const void *) node->left);
         }
 
         if (NULL != node->right)
         {
-            fprintf(file, "NODE%p:right->NODE%p;", (void *) node, (void *) node->right);
+            fprintf(file, "NODE%p:right->NODE%p;\n", (void *) node, (void *) node->right);
         }
     }
 
