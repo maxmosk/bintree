@@ -54,6 +54,8 @@ enum TREE_CODES treePrev(tree_t *tree);
 
 enum TREE_CODES treeVerify(const tree_t *tree);
 
+treeData_t treeData(tree_t *tree);
+
 enum TREE_CODES treeDtor(tree_t *tree);
 
 
