@@ -31,7 +31,14 @@ enum TREE_CODES
     TREE_ERROR    = 1,
     TREE_NULLPTR  = 2,
     TREE_NOMEM    = 3,
-    TREE_STACKERR = 4
+    TREE_STACKERR = 4,
+    TREE_EXISTS   = 5
+};
+
+enum CHILD_CODE
+{
+    LEFT_CHILD  = 0,
+    RIGHT_CHILD = 1
 };
 
 
@@ -39,7 +46,7 @@ enum TREE_CODES treeCtor(tree_t *tree);
 
 bool treeEmpty(const tree_t *tree);
 
-enum TREE_CODES treeInsert(tree_t *tree, treeData_t elem);
+enum TREE_CODES treeInsert(tree_t *tree, enum CHILD_CODE child, treeData_t elem);
 
 
 #endif /* BINTREE_H_INCLUDED__ */

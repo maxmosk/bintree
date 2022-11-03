@@ -25,7 +25,7 @@ bool treeEmpty(const tree_t *tree)
     return NULL == tree->root;
 }
 
-enum TREE_CODES treeInsert(tree_t *tree, treeData_t elem)
+enum TREE_CODES treeInsert(tree_t *tree, enum CHILD_CODE child, treeData_t elem)
 {
     CHECK(NULL != tree, TREE_NULLPTR);
 
@@ -40,53 +40,31 @@ enum TREE_CODES treeInsert(tree_t *tree, treeData_t elem)
     else
     {
         treeNode_t *node = NULL;
-        treeNode_t *nextnode = tree->root;
+        CHECK(STACK_SUCCESS == stackPop(&tree->stack, (void *) &node), TREE_STACKERR);
+        CHECK(STACK_SUCCESS == stackPush(&tree->stack, (void *) node), TREE_STACKERR);
 
-        printf("root");
-        do
+        if (LEFT_CHILD == child)
         {
-            node = nextnode;
-            
-            printf(" -- %s", node->data);
-            int cmp = datacmp(elem, node->data);
-            if (0 == cmp)
-            {
-                printf(";\n");
-                return TREE_SUCCESS;
-            }
-            else if (0 < cmp)
-            {
-                if (NULL == node->left)
-                {
-                    node->left = calloc(1, sizeof *node->left);
-                    nextnode = node->left;
-                    node = NULL;
-                }
-                else
-                {
-                    nextnode = node->left;
-                }
-            }
-            else if (0 > cmp)
-            {
-                if (NULL == node->right)
-                {
-                    node->right = calloc(1, sizeof *node->right);
-                    nextnode = node->right;
-                    node = NULL;
-                }
-                else
-                {
-                    nextnode = node->right;
-                }
-            }
+            CHECK(NULL == node->left, TREE_EXISTS);
         }
-        while (NULL != node);
-        printf(";\n");
+        else if (RIGHT_CHILD == child)
+        {
+            CHECK(NULL == node->right, TREE_EXISTS);
+        }
 
-        CHECK(NULL != nextnode, TREE_NOMEM);
-        nextnode->data = elem;
-        nextnode->left = nextnode->right = NULL;
+        treeNode_t *newnode = calloc(1, sizeof *newnode);
+        CHECK(NULL != newnode, TREE_NOMEM);
+        newnode->data = elem;
+        newnode->right = newnode->left = NULL;
+        
+        if (LEFT_CHILD == child)
+        {
+            node->left = newnode;
+        }
+        else if (RIGHT_CHILD == child)
+        {
+            node->right = newnode;
+        }
     }
 
     return TREE_SUCCESS;

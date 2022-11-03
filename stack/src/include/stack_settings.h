@@ -15,7 +15,7 @@
 #define PRINTELEM(PFILE, ELEM) fprintf(PFILE, "%p", (void *) ELEM)
 
 
-typedef char *elem_t;
+typedef void *elem_t;
 
 
 
