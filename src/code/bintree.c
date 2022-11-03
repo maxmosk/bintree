@@ -4,6 +4,11 @@
 
 const size_t stackInitSize = 10;
 
+static const char gvizbuf[] = "gvizbuffer";
+
+
+static void treeGraph(const tree_t *tree, const char *filename);
+
 
 enum TREE_CODES treeCtor(tree_t *tree)
 {
@@ -127,6 +132,10 @@ enum TREE_CODES treeVerify(tree_t *tree)
 {
     CHECK(NULL != tree, TREE_NULLPTR);
 
+    static size_t ngraphs = 0;
+    char namebuf[64] = "";
+    sprintf(namebuf, "graph%zu.jpg", ngraphs);
+
     LOGOPEN("tree.log");
     LOGPRINTF("<pre>\n");
     LOGPRINTF("tree_t [%p]\n", (void *) tree);
@@ -134,9 +143,32 @@ enum TREE_CODES treeVerify(tree_t *tree)
     LOGPRINTF("    root = %p\n", (void *) tree->root);
     LOGPRINTF("    level = %zu\n", tree->level);
     LOGPRINTF("}\n");
+
+    treeGraph(tree, namebuf);
+    LOGPRINTF("<img src=\"%s\">\n", namebuf);
     LOGPRINTF("</pre>\n");
     LOGCLOSE();
 
     return TREE_SUCCESS;
+}
+
+static void treeGraph(const tree_t *tree, const char *filename)
+{
+    CHECK(NULL != tree, ;);
+    CHECK(NULL != filename, ;);
+
+    FILE *dotfile = fopen(gvizbuf, "w");
+    CHECK(NULL != dotfile, ;);
+
+    fprintf(dotfile, "digraph\n");
+    fprintf(dotfile, "{\n");
+
+
+    fprintf(dotfile, "}");
+    fclose(dotfile);
+
+    char cmdbuf[128] = "";
+    sprintf(cmdbuf, "dot %s -o %s -Tjpg", gvizbuf, filename);
+    CHECK(0 == system(cmdbuf), ;);
 }
 
