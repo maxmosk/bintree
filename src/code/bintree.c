@@ -13,6 +13,8 @@ static void treeGraphAddNode(const treeNode_t *node, FILE *file);
 
 static void treeNodeDtor(treeNode_t *node);
 
+static void nodeApply(treeNode_t *node, void (*func)(treeData_t *, void *), void *params);
+
 
 enum TREE_CODES treeCtor(tree_t *tree)
 {
@@ -210,6 +212,15 @@ static void treeGraphAddNode(const treeNode_t *node, FILE *file)
     treeGraphAddNode(node->right, file);
 }
 
+enum TREE_CODES treeApply(tree_t *tree, void (*func)(treeData_t *, void *), void *params)
+{
+    enum TREE_CODES verify = TREE_ERROR;
+    CHECK(TREE_SUCCESS == (verify = treeVerify(tree)), verify);
+    CHECK(NULL != func, TREE_NULLPTR);
+
+    nodeApply(tree->root, func, params);
+}
+
 treeData_t treeGetData(tree_t *tree)
 {
     enum TREE_CODES verify = TREE_ERROR;
@@ -259,5 +270,17 @@ static void treeNodeDtor(treeNode_t *node)
     treeNodeDtor(node->right);
     treeNodeDtor(node->left);
     free(node);
+}
+
+static void nodeApply(treeNode_t *node, void (*func)(treeData_t *, void *), void *params)
+{
+    if (NULL == node)
+    {
+        return;
+    }
+
+    nodeApply(node->left, func, params);
+    func(node->data, params);
+    nodeApply(node->right, func, params);
 }
 

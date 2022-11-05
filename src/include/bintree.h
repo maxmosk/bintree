@@ -52,6 +52,8 @@ enum TREE_CODES treeNext(tree_t *tree, const enum CHILD_CODE child);
 
 enum TREE_CODES treePrev(tree_t *tree);
 
+enum TREE_CODES treeApply(tree_t *tree, void (*func)(treeData_t *, void *), void *params);
+
 enum TREE_CODES treeVerify(const tree_t *tree);
 
 treeData_t treeGetData(tree_t *tree);
