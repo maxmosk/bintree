@@ -27,9 +27,7 @@ enum CODES play(void);
 
 enum CODES akinator(tree_t *data);
 
-enum CODES unknowen(tree_t *data, enum CHILD_CODE node);
-
-void datafree(char **data, void *dummy);
+enum CODES unknowen(tree_t *data);
 
 
 int main(void)
@@ -42,14 +40,10 @@ int main(void)
 
 enum CODES play(void)
 {
-    tree_t data = {0};
-    treeCtor(&data);
-
     enum MODES mode = getMode();
     switch (mode)
     {
         case AKINATOR:
-            akinator(&data);
             break;
         case DEFINITION:
 
@@ -61,12 +55,8 @@ enum CODES play(void)
         case MODE_ERROR:
         default:
             printf("Undefined mode\n");
-            treeDtor(&data);
             return WRONG_MODE;
     }
-
-    treeApply(&data, datafree, NULL);
-    treeDtor(&data);
 
     return SUCCESS;
 }
@@ -104,7 +94,7 @@ enum CODES akinator(tree_t *data)
 
     if (treeEmpty(data))
     {
-        enum CODES status = unknowen(data, DUMMY_CHILD);
+        enum CODES status = unknowen(data);
         CHECK(SUCCESS == status, status);
     }
 
@@ -113,7 +103,7 @@ enum CODES akinator(tree_t *data)
     return SUCCESS;
 }
 
-enum CODES unknowen(tree_t *data, enum CHILD_CODE node)
+enum CODES unknowen(tree_t *data)
 {
     CHECK(NULL != data, NULLPTRERR);
 
@@ -122,16 +112,7 @@ enum CODES unknowen(tree_t *data, enum CHILD_CODE node)
     char resp[64] = "";
     scanf("%63s", resp);
 
-    CHECK(TREE_SUCCESS == treeInsert(data, node, strdup(resp)), TREE_OPS_ERROR);
+    CHECK(TREE_SUCCESS == treeInsertRoot(data, strdup(resp)), TREE_OPS_ERROR);
     return SUCCESS;
-}
-
-void datafree(char **data, void *dummy)
-{
-    if ((NULL != data) && (NULL == dummy))
-    {
-        free(*data);
-        *data = NULL;
-    }
 }
 
