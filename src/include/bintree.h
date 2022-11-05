@@ -17,7 +17,7 @@ typedef struct treeNode_t_
 
 typedef struct
 {
-    size_t level;
+    size_t size;
     treeNode_t *root;
 } tree_t;
 
@@ -37,7 +37,7 @@ enum TREE_CODES treeCtor(tree_t *tree);
 
 bool treeEmpty(const tree_t *tree);
 
-enum TREE_CODES treeInsert(tree_t *tree, const treeData_t elem);
+enum TREE_CODES treeInsertRoot(tree_t *tree, const treeData_t elem);
 
 enum TREE_CODES treeVerify(const tree_t *tree);
 

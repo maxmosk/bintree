@@ -11,6 +11,8 @@ static void treeGraph(const tree_t *tree, const char *filename);
 
 static void treeGraphAddNode(const treeNode_t *node, FILE *file);
 
+static treeNode_t *treeNodeCtor(const treeData_t elem);
+
 static void treeNodeDtor(treeNode_t *node);
 
 
@@ -19,7 +21,7 @@ enum TREE_CODES treeCtor(tree_t *tree)
     CHECK(NULL != tree, TREE_NULLPTR);
 
     tree->root = NULL;
-    tree->level = 0;
+    tree->size = 0;
 
     return TREE_SUCCESS;
 }
@@ -29,13 +31,19 @@ bool treeEmpty(const tree_t *tree)
     enum TREE_CODES verify = TREE_ERROR;
     CHECK(TREE_SUCCESS == (verify = treeVerify(tree)), false);
 
-    return NULL == tree->root;
+    return (NULL == tree->root) && (0 == tree->size);
 }
 
-enum TREE_CODES treeInsert(tree_t *tree, const treeData_t elem)
+enum TREE_CODES treeInsertRoot(tree_t *tree, const treeData_t elem)
 {
     enum TREE_CODES verify = TREE_ERROR;
     CHECK(TREE_SUCCESS == (verify = treeVerify(tree)), verify);
+
+    CHECK(treeEmpty(tree), TREE_ERROR);
+
+    treeNode_t *newnode = treeNodeCtor(elem);
+    CHECK(NULL != newnode, TREE_NOMEM);
+    tree->root = newnode;
 
     return TREE_SUCCESS;
 }
@@ -53,7 +61,7 @@ enum TREE_CODES treeVerify(const tree_t *tree)
     LOGPRINTF("tree_t [%p]\n", (const void *) tree);
     LOGPRINTF("{\n");
     LOGPRINTF("    root = %p\n", (void *) tree->root);
-    LOGPRINTF("    level = %zu\n", tree->level);
+    LOGPRINTF("    size = %zu\n", tree->size);
     LOGPRINTF("}\n");
 
     treeGraph(tree, namebuf);
@@ -71,7 +79,7 @@ enum TREE_CODES treeDtor(tree_t *tree)
    
     treeNodeDtor(tree->root);
     tree->root = NULL;
-    tree->level = SIZE_MAX;
+    tree->size = SIZE_MAX;
 
     return TREE_SUCCESS;
 }
@@ -130,6 +138,17 @@ static void treeGraphAddNode(const treeNode_t *node, FILE *file)
 
     treeGraphAddNode(node->left, file);
     treeGraphAddNode(node->right, file);
+}
+
+static treeNode_t *treeNodeCtor(const treeData_t elem)
+{
+    treeNode_t *node = calloc(1, sizeof *node);
+    CHECK(NULL != node, NULL);
+
+    node->right = node->left = NULL;
+    node->data = elem;
+
+    return node;
 }
 
 static void treeNodeDtor(treeNode_t *node)
