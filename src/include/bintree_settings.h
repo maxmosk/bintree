@@ -8,7 +8,7 @@
 #define DATA_POISON NULL
 
 
-typedef const char *treeData_t;
+typedef char *treeData_t;
 
 
 #endif /* BINTREE_SETTINGS_H_INCLUDED__ */
