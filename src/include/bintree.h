@@ -39,6 +39,10 @@ bool treeEmpty(const tree_t *tree);
 
 enum TREE_CODES treeInsertRoot(tree_t *tree, const treeData_t elem);
 
+enum TREE_CODES treeInsertLeft(tree_t *tree, treeNode_t *node, const treeData_t elem);
+
+enum TREE_CODES treeInsertRight(tree_t *tree, treeNode_t *node, const treeData_t elem);
+
 enum TREE_CODES treeVerify(const tree_t *tree);
 
 enum TREE_CODES treeDtor(tree_t *tree);

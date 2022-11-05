@@ -2,11 +2,14 @@
 #include "debug.h"
 
 
+/*(===========================================================================*/
 const size_t stackInitSize = 10;
 
 static const char gvizbuf[] = "gvizbuffer";
+/*)===========================================================================*/
 
 
+/*(===========================================================================*/
 static void treeGraph(const tree_t *tree, const char *filename);
 
 static void treeGraphAddNode(const treeNode_t *node, FILE *file);
@@ -14,8 +17,10 @@ static void treeGraphAddNode(const treeNode_t *node, FILE *file);
 static treeNode_t *treeNodeCtor(const treeData_t elem);
 
 static void treeNodeDtor(treeNode_t *node);
+/*)===========================================================================*/
 
 
+/*(===========================================================================*/
 enum TREE_CODES treeCtor(tree_t *tree)
 {
     CHECK(NULL != tree, TREE_NULLPTR);
@@ -43,7 +48,39 @@ enum TREE_CODES treeInsertRoot(tree_t *tree, const treeData_t elem)
 
     treeNode_t *newnode = treeNodeCtor(elem);
     CHECK(NULL != newnode, TREE_NOMEM);
+
     tree->root = newnode;
+    tree->size++;
+
+    return TREE_SUCCESS;
+}
+
+enum TREE_CODES treeInsertLeft(tree_t *tree, treeNode_t *node, const treeData_t elem)
+{
+    enum TREE_CODES verify = TREE_ERROR;
+    CHECK(TREE_SUCCESS == (verify = treeVerify(tree)), verify);
+    CHECK(NULL != node, TREE_NULLPTR);
+
+    treeNode_t *newnode = treeNodeCtor(elem);
+    CHECK(NULL != newnode, TREE_NOMEM);
+    
+    node->left = newnode;
+    tree->size++;
+
+    return TREE_SUCCESS;
+}
+
+enum TREE_CODES treeInsertRight(tree_t *tree, treeNode_t *node, const treeData_t elem)
+{
+    enum TREE_CODES verify = TREE_ERROR;
+    CHECK(TREE_SUCCESS == (verify = treeVerify(tree)), verify);
+    CHECK(NULL != node, TREE_NULLPTR);
+
+    treeNode_t *newnode = treeNodeCtor(elem);
+    CHECK(NULL != newnode, TREE_NOMEM);
+
+    node->right = newnode;
+    tree->size++;
 
     return TREE_SUCCESS;
 }
@@ -83,7 +120,10 @@ enum TREE_CODES treeDtor(tree_t *tree)
 
     return TREE_SUCCESS;
 }
+/*)===========================================================================*/
 
+
+/*(===========================================================================*/
 static void treeGraph(const tree_t *tree, const char *filename)
 {
     CHECK(NULL != tree, ;);
@@ -162,4 +202,5 @@ static void treeNodeDtor(treeNode_t *node)
     treeNodeDtor(node->left);
     free(node);
 }
+/*)===========================================================================*/
 
