@@ -5,7 +5,7 @@
 #include <string.h>
 
 
-#define datacmp strcmp
+#define DATA_POISON NULL
 
 
 typedef const char *treeData_t;

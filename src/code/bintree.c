@@ -210,16 +210,30 @@ static void treeGraphAddNode(const treeNode_t *node, FILE *file)
     treeGraphAddNode(node->right, file);
 }
 
-treeData_t treeData(tree_t *tree)
+treeData_t treeGetData(tree_t *tree)
 {
     enum TREE_CODES verify = TREE_ERROR;
-    CHECK(TREE_SUCCESS == (verify = treeVerify(tree)), NULL);
+    CHECK(TREE_SUCCESS == (verify = treeVerify(tree)), DATA_POISON);
 
     treeNode_t *node = NULL;
-    CHECK(STACK_SUCCESS == stackPop(&tree->stack, (void *) &node), NULL);
-    CHECK(STACK_SUCCESS == stackPush(&tree->stack, (void *) node), NULL);
+    CHECK(STACK_SUCCESS == stackPop(&tree->stack, (void *) &node), DATA_POISON);
+    CHECK(STACK_SUCCESS == stackPush(&tree->stack, (void *) node), DATA_POISON);
 
     return node->data;
+}
+
+enum TREE_CODES treeSetData(tree_t *tree, treeData_t data)
+{
+    enum TREE_CODES verify = TREE_ERROR;
+    CHECK(TREE_SUCCESS == (verify = treeVerify(tree)), verify);
+
+    treeNode_t *node = NULL;
+    CHECK(STACK_SUCCESS == stackPop(&tree->stack, (void *) &node), TREE_STACKERR);
+    CHECK(STACK_SUCCESS == stackPush(&tree->stack, (void *) node), TREE_STACKERR);
+
+    node->data = data;
+
+    return TREE_SUCCESS;
 }
 
 enum TREE_CODES treeDtor(tree_t *tree)
