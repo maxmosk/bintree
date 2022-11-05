@@ -192,7 +192,8 @@ static void treeGraphAddNode(const treeNode_t *node, FILE *file)
     {
         fprintf(file, "NODE%p[style=\"rounded\",shape=record,color=\"blue\",label="
                         "\" <left> left=%p | data=%s | <right> right=%p\"];\n",
-                        (const void *) node, (const void *) node->left, node->data,
+                        (const void *) node, (const void *) node->left,
+                        (NULL != node->data) ? node->data : "",
                         (const void *) node->right);
 
         if (NULL != node->left)
@@ -219,6 +220,8 @@ enum TREE_CODES treeApply(tree_t *tree, void (*func)(treeData_t *, void *), void
     CHECK(NULL != func, TREE_NULLPTR);
 
     nodeApply(tree->root, func, params);
+
+    return TREE_SUCCESS;
 }
 
 treeData_t treeGetData(tree_t *tree)
@@ -280,7 +283,7 @@ static void nodeApply(treeNode_t *node, void (*func)(treeData_t *, void *), void
     }
 
     nodeApply(node->left, func, params);
-    func(node->data, params);
+    func(&node->data, params);
     nodeApply(node->right, func, params);
 }
 
