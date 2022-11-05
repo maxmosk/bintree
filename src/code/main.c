@@ -108,12 +108,14 @@ enum CODES akinator(tree_t *data)
         CHECK(SUCCESS == status, status);
     }
 
+
+
     return SUCCESS;
 }
 
 enum CODES unknowen(tree_t *data, enum CHILD_CODE node)
 {
-    enum CODES unknowen(tree_t *data, enum CHILD_CODE node);
+    CHECK(NULL != data, NULLPTRERR);
 
     printf("Who/What is it?\n");
 
