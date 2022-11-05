@@ -157,6 +157,56 @@ enum TREE_CODES treeVerify(const tree_t *tree)
     return TREE_SUCCESS;
 }
 
+enum TREE_CODES treeApply(tree_t *tree, void (*func)(treeData_t *, void *), void *params)
+{
+    enum TREE_CODES verify = TREE_ERROR;
+    CHECK(TREE_SUCCESS == (verify = treeVerify(tree)), verify);
+    CHECK(NULL != func, TREE_NULLPTR);
+
+    nodeApply(tree->root, func, params);
+
+    return TREE_SUCCESS;
+}
+
+treeData_t treeGetData(tree_t *tree)
+{
+    enum TREE_CODES verify = TREE_ERROR;
+    CHECK(TREE_SUCCESS == (verify = treeVerify(tree)), DATA_POISON);
+
+    treeNode_t *node = NULL;
+    CHECK(STACK_SUCCESS == stackPop(&tree->stack, (void *) &node), DATA_POISON);
+    CHECK(STACK_SUCCESS == stackPush(&tree->stack, (void *) node), DATA_POISON);
+
+    return node->data;
+}
+
+enum TREE_CODES treeSetData(tree_t *tree, treeData_t data)
+{
+    enum TREE_CODES verify = TREE_ERROR;
+    CHECK(TREE_SUCCESS == (verify = treeVerify(tree)), verify);
+
+    treeNode_t *node = NULL;
+    CHECK(STACK_SUCCESS == stackPop(&tree->stack, (void *) &node), TREE_STACKERR);
+    CHECK(STACK_SUCCESS == stackPush(&tree->stack, (void *) node), TREE_STACKERR);
+
+    node->data = data;
+
+    return TREE_SUCCESS;
+}
+
+enum TREE_CODES treeDtor(tree_t *tree)
+{
+    enum TREE_CODES verify = TREE_ERROR;
+    CHECK(TREE_SUCCESS == (verify = treeVerify(tree)), verify);
+   
+    CHECK(STACK_SUCCESS == stackDtor(&tree->stack), TREE_STACKERR);
+    treeNodeDtor(tree->root);
+    tree->root = NULL;
+    tree->level = SIZE_MAX;
+
+    return TREE_SUCCESS;
+}
+
 static void treeGraph(const tree_t *tree, const char *filename)
 {
     CHECK(NULL != tree, ;);
@@ -211,56 +261,6 @@ static void treeGraphAddNode(const treeNode_t *node, FILE *file)
 
     treeGraphAddNode(node->left, file);
     treeGraphAddNode(node->right, file);
-}
-
-enum TREE_CODES treeApply(tree_t *tree, void (*func)(treeData_t *, void *), void *params)
-{
-    enum TREE_CODES verify = TREE_ERROR;
-    CHECK(TREE_SUCCESS == (verify = treeVerify(tree)), verify);
-    CHECK(NULL != func, TREE_NULLPTR);
-
-    nodeApply(tree->root, func, params);
-
-    return TREE_SUCCESS;
-}
-
-treeData_t treeGetData(tree_t *tree)
-{
-    enum TREE_CODES verify = TREE_ERROR;
-    CHECK(TREE_SUCCESS == (verify = treeVerify(tree)), DATA_POISON);
-
-    treeNode_t *node = NULL;
-    CHECK(STACK_SUCCESS == stackPop(&tree->stack, (void *) &node), DATA_POISON);
-    CHECK(STACK_SUCCESS == stackPush(&tree->stack, (void *) node), DATA_POISON);
-
-    return node->data;
-}
-
-enum TREE_CODES treeSetData(tree_t *tree, treeData_t data)
-{
-    enum TREE_CODES verify = TREE_ERROR;
-    CHECK(TREE_SUCCESS == (verify = treeVerify(tree)), verify);
-
-    treeNode_t *node = NULL;
-    CHECK(STACK_SUCCESS == stackPop(&tree->stack, (void *) &node), TREE_STACKERR);
-    CHECK(STACK_SUCCESS == stackPush(&tree->stack, (void *) node), TREE_STACKERR);
-
-    node->data = data;
-
-    return TREE_SUCCESS;
-}
-
-enum TREE_CODES treeDtor(tree_t *tree)
-{
-    enum TREE_CODES verify = TREE_ERROR;
-    CHECK(TREE_SUCCESS == (verify = treeVerify(tree)), verify);
-   
-    CHECK(STACK_SUCCESS == stackDtor(&tree->stack), TREE_STACKERR);
-    treeNodeDtor(tree->root);
-    tree->root = NULL;
-    tree->level = SIZE_MAX;
-
-    return TREE_SUCCESS;
 }
 
 static void treeNodeDtor(treeNode_t *node)
