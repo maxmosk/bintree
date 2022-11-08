@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include "bintree.h"
 #include "debug.h"
+#include "stack.h"
 
 
 enum MODES
@@ -20,11 +21,12 @@ enum MODES
 
 enum CODES
 {
-    SUCCESS        = 0,
-    WRONG_MODE     = 1,
-    NULLPTR_ERROR  = 2,
-    TREE_OPS_ERROR = 3,
-    DATABASE_ERROR = 4
+    SUCCESS         = 0,
+    WRONG_MODE      = 1,
+    NULLPTR_ERROR   = 2,
+    TREE_OPS_ERROR  = 3,
+    DATABASE_ERROR  = 4,
+    STACK_OPS_ERROR = 3
 };
 
 

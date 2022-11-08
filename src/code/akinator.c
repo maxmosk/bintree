@@ -1,6 +1,9 @@
 #include "akinator.h"
 
 
+static const size_t stackinit = 8;
+
+
 /*(===========================================================================*/
 static enum MODES getmode(void);
 
@@ -11,6 +14,8 @@ static enum CODES unknowen(tree_t *data);
 static char *readdatabase(const char *dbname, tree_t *dest);
 
 static long long getfilesize(const char *filename);
+
+static enum CODES parsedata(tree_t *dest, const char *src);
 /*)===========================================================================*/
 
 
@@ -19,7 +24,7 @@ enum CODES play(void)
 {
     tree_t database = {0};
     CHECK(TREE_SUCCESS == treeCtor(&database), TREE_OPS_ERROR);
-    char *datatext = readdatabase("data.txt", &database);
+    char *datatext = readdatabase("../data.txt", &database);
     CHECK(NULL != datatext, DATABASE_ERROR);
 
     enum MODES mode = getmode();
@@ -117,6 +122,14 @@ static char *readdatabase(const char *dbname, tree_t *dest)
         return NULL;
     }
 
+    fclose(datafile);
+
+    if (SUCCESS != parsedata(dest, data))
+    {
+        free(data);
+        return NULL;
+    }
+
     return data;
 }
 
@@ -128,5 +141,18 @@ static long long getfilesize(const char *filename)
     CHECK(0 == stat(filename, &buf), -1);
 
     return buf.st_size;
+}
+
+static enum CODES parsedata(tree_t *dest, const char *src)
+{
+    CHECK(NULL != dest, NULLPTR_ERROR);
+    CHECK(NULL != src, NULLPTR_ERROR);
+
+    stack_t stack = {0};
+    CHECK(STACK_SUCCESS == stackCtor(&stack, stackinit), STACK_OPS_ERROR);
+
+    CHECK(STACK_SUCCESS == stackDtor(&stack), STACK_OPS_ERROR);
+
+    return SUCCESS;
 }
 /*)===========================================================================*/
