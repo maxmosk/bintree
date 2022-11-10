@@ -17,7 +17,7 @@ static char *readdatabase(const char *dbname, tree_t *dest);
 
 static long long getfilesize(const char *filename);
 
-static char *parsedata(tree_t *dest, treeNode_t *node, const char *src);
+static char *parsedata(tree_t *dest, treeNode_t *node, char *src);
 
 static void savedata(FILE *file, treeNode_t *subtree);
 /*)===========================================================================*/
@@ -35,6 +35,10 @@ enum CODES play(void)
     switch (mode)
     {
         case AKINATOR:
+        {
+            enum CODES status = akinator(&database);
+            CHECK(SUCCESS == status, status);
+        }
             break;
         case DEFINITION:
 
@@ -96,6 +100,45 @@ static enum CODES akinator(tree_t *data)
 {
     CHECK(NULL != data, NULLPTR_ERROR);
 
+    treeNode_t *node = data->root;
+    while ((NULL != node->left) && (NULL != node->right))
+    {
+        printf("It is %s? ", node->data);
+
+        int resp = '\0';
+        do
+        {
+            resp = getchar();
+        }
+        while (('y' != resp) && ('n' != resp));
+
+        if (resp == 'y')
+        {
+            node = node->left;
+        }
+        else if (resp == 'n')
+        {
+            node = node->right;
+        }
+    }
+
+    printf("It is %s? ", node->data);
+    int resp = '\0';
+    do
+    {
+        resp = getchar();
+    }
+    while (('y' != resp) && ('n' != resp));
+
+    if (resp == 'y')
+    {
+        printf("I said...\n");
+    }
+    else if (resp == 'n')
+    {
+        printf("But what is it?");
+    }
+
     return SUCCESS;
 }
 
@@ -153,7 +196,7 @@ static long long getfilesize(const char *filename)
     return buf.st_size;
 }
 
-static char *parsedata(tree_t *dest, treeNode_t *node, const char *src)
+static char *parsedata(tree_t *dest, treeNode_t *node, char *src)
 {
     CHECK(NULL != dest, NULL);
     CHECK(NULL != node, NULL);
