@@ -1,7 +1,9 @@
 #include "akinator.h"
 
 
+/*(===========================================================================*/
 static const size_t stackinit = 8;
+/*)===========================================================================*/
 
 
 /*(===========================================================================*/
@@ -15,7 +17,7 @@ static char *readdatabase(const char *dbname, tree_t *dest);
 
 static long long getfilesize(const char *filename);
 
-static enum CODES parsedata(tree_t *dest, const char *src);
+static char *parsedata(tree_t *dest, treeNode_t *node, const char *src);
 /*)===========================================================================*/
 
 
@@ -100,7 +102,7 @@ static enum CODES unknowen(tree_t *data)
 static char *readdatabase(const char *dbname, tree_t *dest)
 {
     CHECK(NULL != dbname, NULL);
-    CHECK(NULL != dest, NULL);
+    CHECK(NULL != dest,   NULL);
 
     long long filesize = getfilesize(dbname);
     CHECK(filesize > 0, NULL);
@@ -124,7 +126,8 @@ static char *readdatabase(const char *dbname, tree_t *dest)
 
     fclose(datafile);
 
-    if (SUCCESS != parsedata(dest, data))
+    CHECK(TREE_SUCCESS == treeInsertRoot(dest, NULL), NULL);
+    if (NULL == parsedata(dest, dest->root, data))
     {
         free(data);
         return NULL;
@@ -143,16 +146,49 @@ static long long getfilesize(const char *filename)
     return buf.st_size;
 }
 
-static enum CODES parsedata(tree_t *dest, const char *src)
+static char *parsedata(tree_t *dest, treeNode_t *node, const char *src)
 {
-    CHECK(NULL != dest, NULLPTR_ERROR);
-    CHECK(NULL != src, NULLPTR_ERROR);
+    CHECK(NULL != dest, NULL);
+    CHECK(NULL != node, NULL);
+    CHECK(NULL != src,  NULL);
 
-    stack_t stack = {0};
-    CHECK(STACK_SUCCESS == stackCtor(&stack, stackinit), STACK_OPS_ERROR);
+    int shift = 0;
+    char buf = '\0';
+    sscanf(src, " %c %n", &buf, &shift);
 
-    CHECK(STACK_SUCCESS == stackDtor(&stack), STACK_OPS_ERROR);
+    if ('{' == buf)
+    {
+        src += shift;
+        node->data = strchr(src, '"') + 1;
+        CHECK(NULL != node->data, NULL);
 
-    return SUCCESS;
+        char *nextsep = strchr(node->data, '"');
+        CHECK(NULL != nextsep, NULL);
+        *nextsep = '\0';
+        src = nextsep + 1;
+
+        CHECK(TREE_SUCCESS == treeInsertLeft(dest, node, NULL), NULL);
+        src = parsedata(dest, node->left, src);
+        CHECK(NULL != src, NULL);
+
+        CHECK(TREE_SUCCESS == treeInsertRight(dest, node, NULL), NULL);
+        src = parsedata(dest, node->right, src);
+        CHECK(NULL != src, NULL);
+    }
+    else if ('"' == buf)
+    {
+        node->data = src += shift;
+        
+        char *nextsep = strchr(node->data, '"');
+        CHECK(NULL != nextsep, NULL);
+        *nextsep = '\0';
+        src = nextsep + 1;
+    }
+    else
+    {
+        return NULL;
+    }
+
+    return src;
 }
 /*)===========================================================================*/
