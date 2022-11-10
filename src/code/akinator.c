@@ -174,6 +174,11 @@ static char *parsedata(tree_t *dest, treeNode_t *node, const char *src)
         CHECK(TREE_SUCCESS == treeInsertRight(dest, node, NULL), NULL);
         src = parsedata(dest, node->right, src);
         CHECK(NULL != src, NULL);
+
+        char *closer = strchr(src, '}');
+        CHECK(NULL != closer, NULL);
+        *closer = '\0';
+        src = closer + 1;
     }
     else if ('"' == buf)
     {

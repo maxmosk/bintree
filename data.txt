@@ -1,5 +1,13 @@
 {   
     "animal"
     "poltorash"
-    "ded32"
+    {
+        "true gachi boy"
+        {
+            "2nd year student"
+            "StASS"
+            "Max"
+        }
+        "ded32"
+    }
 }
