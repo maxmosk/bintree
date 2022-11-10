@@ -15,6 +15,8 @@ static long long getfilesize(const char *filename);
 static char *parsedata(tree_t *dest, treeNode_t *node, char *src);
 
 static void savedata(FILE *file, treeNode_t *subtree);
+
+static char *getresp(void);
 /*)===========================================================================*/
 
 
@@ -131,20 +133,22 @@ static enum CODES akinator(tree_t *data)
         printf("But what is it? ");
         
         char *olddata = node->data.string;
-        size_t len = 64;
-        node->data.string = NULL;
-        
+
         while (getchar() != '\n') { ; }
-        CHECK(-1 != getline(&node->data.string, &len, stdin), NO_MEMORY_ERROR);
+        char *newdata = getresp();
+        CHECK(NULL != newdata, NO_MEMORY_ERROR);
+
+        printf("What is the difference between %s and %s in all? ", newdata, olddata);
+
+        node->data.string = getresp();
+        CHECK(NULL != node->data.string, NO_MEMORY_ERROR);
         node->data.alloced = true;
 
-        char *newline = strchr(node->data.string, '\n');
-        if (NULL != newline)
-        {
-            *newline = '\0';
-        }
+        treeData_t leftelem = {newdata, true};
+        CHECK(TREE_SUCCESS == treeInsertLeft(data, node, leftelem), TREE_OPS_ERROR);
 
-        printf("What is the difference between %s and %s in one string?", node->data.string, olddata);
+        treeData_t rightelem = {olddata, false};
+        CHECK(TREE_SUCCESS == treeInsertRight(data, node, rightelem), TREE_OPS_ERROR);
     }
 
     FILE *save = fopen("../data.txt", "w");
@@ -279,5 +283,20 @@ static void savedata(FILE *file, treeNode_t *subtree)
         savedata(file, subtree->right);
         fprintf(file, "}\n");
     }
+}
+
+static char *getresp(void)
+{
+    char *data = NULL;
+    size_t len = 64;
+    CHECK(-1 != getline(&data, &len, stdin), NULL);
+
+    char *newline = strchr(data, '\n');
+    if (NULL != newline)
+    {
+        *newline = '\0';
+    }
+
+    return data;
 }
 /*)===========================================================================*/

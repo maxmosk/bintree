@@ -2,7 +2,11 @@
 "animal"
 {
 "cute"
+{
+"not cute"
+"cat"
 "poltorash"
+}
 "pystech.dog"
 }
 {
