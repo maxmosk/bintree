@@ -3,12 +3,17 @@
 
 
 #include <string.h>
+#include <stdbool.h>
 
 
 #define DATA_POISON NULL
 
 
-typedef char *treeData_t;
+typedef struct
+{
+    char *string;
+    bool alloced;
+} treeData_t;
 
 
 #endif /* BINTREE_SETTINGS_H_INCLUDED__ */

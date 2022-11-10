@@ -160,7 +160,7 @@ static void treeGraphAddNode(const treeNode_t *node, FILE *file)
         fprintf(file, "NODE%p[style=\"rounded\",shape=record,color=\"blue\",label="
                         "\" <left> left=%p | data=%s | <right> right=%p\"];\n",
                         (const void *) node, (const void *) node->left,
-                        (NULL != node->data) ? node->data : "",
+                        (NULL != node->data.string) ? node->data.string : "",
                         (const void *) node->right);
 
         if (NULL != node->left)
@@ -196,6 +196,11 @@ static void treeNodeDtor(treeNode_t *node)
     if (NULL == node)
     {
         return;
+    }
+
+    if (node->data.alloced)
+    {
+        free(node->data.string);
     }
 
     treeNodeDtor(node->right);

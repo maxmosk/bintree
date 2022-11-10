@@ -2,11 +2,6 @@
 
 
 /*(===========================================================================*/
-static const size_t stackinit = 8;
-/*)===========================================================================*/
-
-
-/*(===========================================================================*/
 static enum MODES getmode(void);
 
 static enum CODES akinator(tree_t *data);
@@ -55,10 +50,7 @@ enum CODES play(void)
             return WRONG_MODE;
     }
 
-    FILE *save = fopen("../data.txt", "w");
-    CHECK(NULL != save, FILE_ERROR);
-    savedata(save, database.root);
-    fclose(save);
+    
 
     CHECK(TREE_SUCCESS == treeDtor(&database), TREE_OPS_ERROR);
     free(datatext);
@@ -103,7 +95,7 @@ static enum CODES akinator(tree_t *data)
     treeNode_t *node = data->root;
     while ((NULL != node->left) && (NULL != node->right))
     {
-        printf("It is %s? ", node->data);
+        printf("It is %s? ", node->data.string);
 
         int resp = '\0';
         do
@@ -122,7 +114,7 @@ static enum CODES akinator(tree_t *data)
         }
     }
 
-    printf("It is %s? ", node->data);
+    printf("It is %s? ", node->data.string);
     int resp = '\0';
     do
     {
@@ -136,8 +128,29 @@ static enum CODES akinator(tree_t *data)
     }
     else if (resp == 'n')
     {
-        printf("But what is it?");
+        printf("But what is it? ");
+        
+        char *olddata = node->data.string;
+        size_t len = 64;
+        node->data.string = NULL;
+        
+        while (getchar() != '\n') { ; }
+        CHECK(-1 != getline(&node->data.string, &len, stdin), NO_MEMORY_ERROR);
+        node->data.alloced = true;
+
+        char *newline = strchr(node->data.string, '\n');
+        if (NULL != newline)
+        {
+            *newline = '\0';
+        }
+
+        printf("What is the difference between %s and %s in one string?", node->data.string, olddata);
     }
+
+    FILE *save = fopen("../data.txt", "w");
+    CHECK(NULL != save, FILE_ERROR);
+    savedata(save, data->root);
+    fclose(save);
 
     return SUCCESS;
 }
@@ -176,7 +189,8 @@ static char *readdatabase(const char *dbname, tree_t *dest)
 
     fclose(datafile);
 
-    CHECK(TREE_SUCCESS == treeInsertRoot(dest, NULL), NULL);
+    treeData_t nulldata = {NULL};
+    CHECK(TREE_SUCCESS == treeInsertRoot(dest, nulldata), NULL);
     if (NULL == parsedata(dest, dest->root, data))
     {
         free(data);
@@ -209,19 +223,20 @@ static char *parsedata(tree_t *dest, treeNode_t *node, char *src)
     if ('{' == buf)
     {
         src += shift;
-        node->data = strchr(src, '"') + 1;
-        CHECK(NULL != node->data, NULL);
+        node->data.string = strchr(src, '"') + 1;
+        CHECK(NULL != node->data.string, NULL);
 
-        char *nextsep = strchr(node->data, '"');
+        char *nextsep = strchr(node->data.string, '"');
         CHECK(NULL != nextsep, NULL);
         *nextsep = '\0';
         src = nextsep + 1;
 
-        CHECK(TREE_SUCCESS == treeInsertLeft(dest, node, NULL), NULL);
+        treeData_t nulldata = {NULL, false};
+        CHECK(TREE_SUCCESS == treeInsertLeft(dest, node, nulldata), NULL);
         src = parsedata(dest, node->left, src);
         CHECK(NULL != src, NULL);
 
-        CHECK(TREE_SUCCESS == treeInsertRight(dest, node, NULL), NULL);
+        CHECK(TREE_SUCCESS == treeInsertRight(dest, node, nulldata), NULL);
         src = parsedata(dest, node->right, src);
         CHECK(NULL != src, NULL);
 
@@ -232,9 +247,9 @@ static char *parsedata(tree_t *dest, treeNode_t *node, char *src)
     }
     else if ('"' == buf)
     {
-        node->data = src += shift;
+        node->data.string = src += shift;
         
-        char *nextsep = strchr(node->data, '"');
+        char *nextsep = strchr(node->data.string, '"');
         CHECK(NULL != nextsep, NULL);
         *nextsep = '\0';
         src = nextsep + 1;
@@ -254,12 +269,12 @@ static void savedata(FILE *file, treeNode_t *subtree)
 
     if ((NULL == subtree->left) && (NULL == subtree->right))
     {
-        fprintf(file, "\"%s\"\n", subtree->data);
+        fprintf(file, "\"%s\"\n", subtree->data.string);
     }
     else
     {
         fprintf(file, "{\n");
-        fprintf(file, "\"%s\"\n", subtree->data);
+        fprintf(file, "\"%s\"\n", subtree->data.string);
         savedata(file, subtree->left);
         savedata(file, subtree->right);
         fprintf(file, "}\n");

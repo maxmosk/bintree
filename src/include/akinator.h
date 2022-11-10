@@ -27,7 +27,8 @@ enum CODES
     TREE_OPS_ERROR  = 3,
     DATABASE_ERROR  = 4,
     STACK_OPS_ERROR = 5,
-    FILE_ERROR      = 6
+    FILE_ERROR      = 6,
+    NO_MEMORY_ERROR = 7
 };
 
 
