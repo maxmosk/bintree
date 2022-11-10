@@ -6,7 +6,7 @@ static enum MODES getmode(void);
 
 static enum CODES akinator(tree_t *data);
 
-static enum CODES unknowen(tree_t *data);
+static enum CODES unknowen(tree_t *data, treeNode_t *node);
 
 static char *readdatabase(const char *dbname, tree_t *dest);
 
@@ -51,8 +51,6 @@ enum CODES play(void)
             free(datatext);
             return WRONG_MODE;
     }
-
-    
 
     CHECK(TREE_SUCCESS == treeDtor(&database), TREE_OPS_ERROR);
     free(datatext);
@@ -130,25 +128,8 @@ static enum CODES akinator(tree_t *data)
     }
     else if (resp == 'n')
     {
-        printf("But what is it? ");
-        
-        char *olddata = node->data.string;
-
-        while (getchar() != '\n') { ; }
-        char *newdata = getresp();
-        CHECK(NULL != newdata, NO_MEMORY_ERROR);
-
-        printf("What is the difference between %s and %s in all? ", newdata, olddata);
-
-        node->data.string = getresp();
-        CHECK(NULL != node->data.string, NO_MEMORY_ERROR);
-        node->data.alloced = true;
-
-        treeData_t leftelem = {newdata, true};
-        CHECK(TREE_SUCCESS == treeInsertLeft(data, node, leftelem), TREE_OPS_ERROR);
-
-        treeData_t rightelem = {olddata, false};
-        CHECK(TREE_SUCCESS == treeInsertRight(data, node, rightelem), TREE_OPS_ERROR);
+        enum CODES status = unknowen(data, node);
+        CHECK(SUCCESS == status, status);
     }
 
     FILE *save = fopen("../data.txt", "w");
@@ -159,9 +140,28 @@ static enum CODES akinator(tree_t *data)
     return SUCCESS;
 }
 
-static enum CODES unknowen(tree_t *data)
+static enum CODES unknowen(tree_t *data, treeNode_t *node)
 {
     CHECK(NULL != data, NULLPTR_ERROR);
+
+    printf("But what is it? ");
+
+    while (getchar() != '\n') { ; }
+    char *newdata = getresp();
+    CHECK(NULL != newdata, NO_MEMORY_ERROR);
+
+    printf("What is the difference between %s and %s in all? ", newdata, node->data.string);
+
+    char *olddata = node->data.string;
+    node->data.string = getresp();
+    CHECK(NULL != node->data.string, NO_MEMORY_ERROR);
+    node->data.alloced = true;
+
+    treeData_t leftelem = {newdata, true};
+    CHECK(TREE_SUCCESS == treeInsertLeft(data, node, leftelem), TREE_OPS_ERROR);
+
+    treeData_t rightelem = {olddata, false};
+    CHECK(TREE_SUCCESS == treeInsertRight(data, node, rightelem), TREE_OPS_ERROR);
 
     return SUCCESS;
 }
