@@ -18,6 +18,8 @@ static char *readdatabase(const char *dbname, tree_t *dest);
 static long long getfilesize(const char *filename);
 
 static char *parsedata(tree_t *dest, treeNode_t *node, const char *src);
+
+static void savedata(FILE *file, treeNode_t *subtree);
 /*)===========================================================================*/
 
 
@@ -48,6 +50,11 @@ enum CODES play(void)
             free(datatext);
             return WRONG_MODE;
     }
+
+    FILE *save = fopen("../data.txt", "w");
+    CHECK(NULL != save, FILE_ERROR);
+    savedata(save, database.root);
+    fclose(save);
 
     CHECK(TREE_SUCCESS == treeDtor(&database), TREE_OPS_ERROR);
     free(datatext);
@@ -195,5 +202,24 @@ static char *parsedata(tree_t *dest, treeNode_t *node, const char *src)
     }
 
     return src;
+}
+
+static void savedata(FILE *file, treeNode_t *subtree)
+{
+    CHECK(NULL != file,    ;);
+    CHECK(NULL != subtree, ;);
+
+    if ((NULL == subtree->left) && (NULL == subtree->right))
+    {
+        fprintf(file, "\"%s\"\n", subtree->data);
+    }
+    else
+    {
+        fprintf(file, "{\n");
+        fprintf(file, "\"%s\"\n", subtree->data);
+        savedata(file, subtree->left);
+        savedata(file, subtree->right);
+        fprintf(file, "}\n");
+    }
 }
 /*)===========================================================================*/

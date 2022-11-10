@@ -1,13 +1,17 @@
-{   
-    "animal"
-    "poltorash"
-    {
-        "true gachi boy"
-        {
-            "2nd year student"
-            "StASS"
-            "Max"
-        }
-        "ded32"
-    }
+{
+"animal"
+{
+"cute"
+"poltorash"
+"pystech.dog"
+}
+{
+"true gachi boy"
+{
+"2nd year student"
+"Max"
+"StASS"
+}
+"ded32"
+}
 }
