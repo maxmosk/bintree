@@ -19,10 +19,10 @@ EXECUTABLE=$(BUILDDIR)/akinator
 all: $(BUILDDIR) $(EXECUTABLE)
 
 
-debug: CFLAGS+= $(CFLAGS_FLAGS) $(CFLAGS_DEBUG) 
+debug: CFLAGS+= $(CFLAGS_FLAGS) $(CFLAGS_DEBUG) -lasan
 debug: all
 
-release: CFLAGS+= -D NDEBUG -D NDEBUG_LOG -lasan
+release: CFLAGS+= -D NDEBUG -D NDEBUG_LOG
 release: all
 
 

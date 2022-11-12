@@ -10,9 +10,11 @@ static const char gvizbuf[] = "gvizbuffer";
 
 
 /*(===========================================================================*/
+#ifndef NDEBUG
 static void treeGraph(const tree_t *tree, const char *filename);
 
 static void treeGraphAddNode(const treeNode_t *node, FILE *file);
+#endif /* NDEBUG */
 
 static treeNode_t *treeNodeCtor(const treeData_t elem);
 
@@ -89,6 +91,7 @@ enum TREE_CODES treeVerify(const tree_t *tree)
 {
     CHECK(NULL != tree, TREE_NULLPTR);
 
+#ifndef NDEBUG
     static size_t ngraphs = 0;
     char namebuf[64] = "";
     sprintf(namebuf, "graph%zu.jpg", ngraphs++);
@@ -105,6 +108,7 @@ enum TREE_CODES treeVerify(const tree_t *tree)
     LOGPRINTF("<img src=\"%s\">\n", namebuf);
     LOGPRINTF("</pre>\n");
     LOGCLOSE();
+#endif /* NDEBUG */
 
     return TREE_SUCCESS;
 }
@@ -124,6 +128,7 @@ enum TREE_CODES treeDtor(tree_t *tree)
 
 
 /*(===========================================================================*/
+#ifndef NDEBUG
 static void treeGraph(const tree_t *tree, const char *filename)
 {
     CHECK(NULL != tree, ;);
@@ -179,6 +184,7 @@ static void treeGraphAddNode(const treeNode_t *node, FILE *file)
     treeGraphAddNode(node->left, file);
     treeGraphAddNode(node->right, file);
 }
+#endif /* NDEBUG */
 
 static treeNode_t *treeNodeCtor(const treeData_t elem)
 {

@@ -374,6 +374,8 @@ static enum CODES definition(tree_t *data)
         SPEAK("%s is undefined!\n", lookdata);
     }
 
+    free(lookdata);
+
     return SUCCESS;
 }
 /*)---------------------------------------------------------------------------*/
@@ -432,6 +434,9 @@ static enum CODES difference(tree_t *data)
 
     difference_rec(data->root, elem_1, elem_2);
     putchar('\n');
+
+    free(elem_1);
+    free(elem_2);
     
     return SUCCESS;
 }
