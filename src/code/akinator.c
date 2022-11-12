@@ -2,6 +2,11 @@
 
 
 /*(===========================================================================*/
+const char *databasefile = "../data.txt";
+/*)===========================================================================*/
+
+
+/*(===========================================================================*/
 static enum MODES getmode(void);
 
 static enum CODES akinator(tree_t *data);
@@ -25,7 +30,7 @@ enum CODES play(void)
 {
     tree_t database = {0};
     CHECK(TREE_SUCCESS == treeCtor(&database), TREE_OPS_ERROR);
-    char *datatext = readdatabase("../data.txt", &database);
+    char *datatext = readdatabase(databasefile, &database);
     CHECK(NULL != datatext, DATABASE_ERROR);
 
     enum MODES mode = getmode();
@@ -132,7 +137,7 @@ static enum CODES akinator(tree_t *data)
         CHECK(SUCCESS == status, status);
     }
 
-    FILE *save = fopen("../data.txt", "w");
+    FILE *save = fopen(databasefile, "w");
     CHECK(NULL != save, FILE_ERROR);
     savedata(save, data->root);
     fclose(save);
