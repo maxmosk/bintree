@@ -7,8 +7,6 @@
 #include <string.h>
 #include <sys/stat.h>
 #include "bintree.h"
-#include "debug.h"
-#include "stack.h"
 
 
 enum MODES

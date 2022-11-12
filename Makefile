@@ -1,16 +1,12 @@
-.PHONY: all clean cleanlib debug release updlib buildlib cplib
+.PHONY: all clean debug release
 
 include CMakefile
 
 #Compiler flags
 CFLAGS=$(CFLAGS_WARNINGS) $(CFLAGS_SYNTAX) -I$(LIBDIR)/src/include
-LD=ld
-LDFLAGS=-relocatable
 CCLDFLAGS=$(CFLAGS_LINK)
 
 
-MODE=
-LIBDIR=stack
 SOURCEDIR=src/code
 HEADERDIR=src/include
 BUILDDIR=build
@@ -20,25 +16,14 @@ OBJFILES=$(patsubst $(SOURCEDIR)/%.c,$(BUILDDIR)/%.o,$(SOURCES))
 EXECUTABLE=$(BUILDDIR)/akinator
 
 
-all: $(BUILDDIR) cplib $(EXECUTABLE)
+all: $(BUILDDIR) $(EXECUTABLE)
 
 
 debug: CFLAGS+= $(CFLAGS_FLAGS) $(CFLAGS_DEBUG) 
 debug: all
-debug: MODE+=debug
 
-release: CFLAGS+= -D NDEBUG -D NDEBUG_LOG -D NDEBUG_HASH -D NDEBUG_CANARY
+release: CFLAGS+= -D NDEBUG -D NDEBUG_LOG -lasan
 release: all
-release: MODE+=release
-
-
-buildlib: $(LIBDIR)
-	cd stack;   		\
-		make clean;		\
-		make $(MODE)
-
-cplib: $(BUILDDIR) buildlib
-	cp $(LIBDIR)/build/lib*.o $(BUILDDIR)
 
 
 $(BUILDDIR):
@@ -53,7 +38,3 @@ $(OBJFILES): $(BUILDDIR)/%.o : $(SOURCEDIR)/%.c $(HEADFILES)
 
 clean:
 	rm -rf $(BUILDDIR)
-
-cleanlib:
-	rm -rf $(LIBDIR)
-
