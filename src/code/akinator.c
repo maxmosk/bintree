@@ -27,10 +27,16 @@ static char *getresp(void);
 static enum CODES definition(tree_t *data);
 
 static bool definition_rec(const treeNode_t *node, const char *elem);
+
+static enum CODES difference(tree_t *data);
+
+static enum DEF_CODES
+difference_rec(const treeNode_t *node, const char *elem_1, const char *elem_2);
 /*)===========================================================================*/
 
 
 /*(===========================================================================*/
+/*(---------------------------------------------------------------------------*/
 enum CODES play(void)
 {
     tree_t database = {0};
@@ -54,7 +60,10 @@ enum CODES play(void)
         }
             break;
         case DIFFERENCE:
-
+        {
+            enum CODES status = difference(&database);
+            CHECK(SUCCESS == status, status);
+        }
             break;
 
         case MODE_ERROR:
@@ -70,10 +79,12 @@ enum CODES play(void)
 
     return SUCCESS;
 }
+/*)---------------------------------------------------------------------------*/
 /*)===========================================================================*/
 
 
 /*(===========================================================================*/
+/*(---------------------------------------------------------------------------*/
 static enum MODES getmode(void)
 {
     printf("Please, choose mode:\n");
@@ -100,7 +111,9 @@ static enum MODES getmode(void)
 
     return MODE_ERROR;
 }
+/*)---------------------------------------------------------------------------*/
 
+/*(---------------------------------------------------------------------------*/
 static enum CODES akinator(tree_t *data)
 {
     CHECK(NULL != data, NULLPTR_ERROR);
@@ -153,7 +166,9 @@ static enum CODES akinator(tree_t *data)
 
     return SUCCESS;
 }
+/*)---------------------------------------------------------------------------*/
 
+/*(---------------------------------------------------------------------------*/
 static enum CODES unknowen(tree_t *data, treeNode_t *node)
 {
     CHECK(NULL != data, NULLPTR_ERROR);
@@ -178,7 +193,9 @@ static enum CODES unknowen(tree_t *data, treeNode_t *node)
 
     return SUCCESS;
 }
+/*)---------------------------------------------------------------------------*/
 
+/*(---------------------------------------------------------------------------*/
 static char *readdatabase(const char *dbname, tree_t *dest)
 {
     CHECK(NULL != dbname, NULL);
@@ -216,7 +233,9 @@ static char *readdatabase(const char *dbname, tree_t *dest)
 
     return data;
 }
+/*)---------------------------------------------------------------------------*/
 
+/*(---------------------------------------------------------------------------*/
 static long long getfilesize(const char *filename)
 {
     CHECK(NULL != filename, LONG_MIN);
@@ -226,7 +245,9 @@ static long long getfilesize(const char *filename)
 
     return buf.st_size;
 }
+/*)---------------------------------------------------------------------------*/
 
+/*(---------------------------------------------------------------------------*/
 static char *parsedata(tree_t *dest, treeNode_t *node, char *src)
 {
     CHECK(NULL != dest, NULL);
@@ -278,7 +299,9 @@ static char *parsedata(tree_t *dest, treeNode_t *node, char *src)
 
     return src;
 }
+/*)---------------------------------------------------------------------------*/
 
+/*(---------------------------------------------------------------------------*/
 static void savedata(FILE *file, treeNode_t *subtree)
 {
     CHECK(NULL != file,    ;);
@@ -297,7 +320,9 @@ static void savedata(FILE *file, treeNode_t *subtree)
         fprintf(file, "}\n");
     }
 }
+/*)---------------------------------------------------------------------------*/
 
+/*(---------------------------------------------------------------------------*/
 static char *getresp(void)
 {
     char *data = NULL;
@@ -312,29 +337,33 @@ static char *getresp(void)
 
     return data;
 }
+/*)---------------------------------------------------------------------------*/
 
+/*(---------------------------------------------------------------------------*/
 static enum CODES definition(tree_t *data)
 {
     CHECK(NULL != data, NULLPTR_ERROR);
 
-    printf("Input some to define: ");
-
     while (getchar() != '\n') { ; }
+
+    printf("Input some to define: ");
     char *lookdata = getresp();
     CHECK(NULL != lookdata, NO_MEMORY_ERROR);
 
-    if (!definition_rec(data->root, lookdata))
+    if (definition_rec(data->root, lookdata))
     {
-        printf("%s is undefined!\n", lookdata);
+        putchar('\n');
     }
     else
     {
-        putchar('\n');
+        printf("%s is undefined!\n", lookdata);
     }
 
     return SUCCESS;
 }
+/*)---------------------------------------------------------------------------*/
 
+/*(---------------------------------------------------------------------------*/
 static bool definition_rec(const treeNode_t *node, const char *elem)
 {
     CHECK(NULL != node, false);
@@ -369,4 +398,103 @@ static bool definition_rec(const treeNode_t *node, const char *elem)
 
     return false;
 }
+/*)---------------------------------------------------------------------------*/
+
+/*(---------------------------------------------------------------------------*/
+static enum CODES difference(tree_t *data)
+{
+    CHECK(NULL != data, NULLPTR_ERROR);
+
+    while (getchar() != '\n') { ; }
+
+    printf("Input 1-st element to compare: ");
+    char *elem_1 = getresp();
+    CHECK(NULL != elem_1, NO_MEMORY_ERROR);
+
+    printf("Input 2-nd element to compare: ");
+    char *elem_2 = getresp();
+    CHECK(NULL != elem_2, NO_MEMORY_ERROR);
+
+    difference_rec(data->root, elem_1, elem_2);
+    putchar('\n');
+    
+    return SUCCESS;
+}
+/*)---------------------------------------------------------------------------*/
+
+/*(---------------------------------------------------------------------------*/
+static enum DEF_CODES
+difference_rec(const treeNode_t *node, const char *elem_1, const char *elem_2)
+{
+    CHECK(NULL != node,   false);
+    CHECK(NULL != elem_1, false);
+    CHECK(NULL != elem_2, false);
+
+    if ((NULL != node->left) && (NULL != node->right))
+    {
+        enum DEF_CODES right = difference_rec(node->right, elem_1, elem_2);
+        enum DEF_CODES left  = difference_rec(node->left, elem_1, elem_2);
+
+        if (BOTH_FIND == left)
+        {
+            printf("But %s and %s both are %s\n", elem_1, elem_2, node->data.string);
+        }
+        else if (BOTH_FIND == right)
+        {
+            printf("But %s and %s both are not %s\n", elem_1, elem_2, node->data.string);
+        }
+        else if ((BOTH_NOTFIND != right) && (BOTH_NOTFIND != left))
+        {
+            const char *fortrue  = (FIRST_FIND == left) ? elem_1 : elem_2;
+            const char *forfalse = (FIRST_FIND == left) ? elem_2 : elem_1;
+            printf("But %s is %s and %s is not %s\n",
+                    fortrue, node->data.string, forfalse, node->data.string);
+        }
+        else if (BOTH_NOTFIND != left)
+        {
+            printf("- is %s\n", node->data.string);
+        }
+        else if (BOTH_NOTFIND != right)
+        {
+            printf("- is not %s\n", node->data.string);
+        }
+
+        if ((BOTH_FIND == left) || (BOTH_FIND == right) ||
+            ((BOTH_NOTFIND != right) && (BOTH_NOTFIND != left)))
+        {
+            return BOTH_FIND;
+        }
+        else if (BOTH_NOTFIND != left)
+        {
+            return left;
+        }
+        else if (BOTH_NOTFIND != right)
+        {
+            return right;
+        }
+        else
+        {
+            return BOTH_NOTFIND;
+        }
+    }
+    else
+    {
+        CHECK(NULL != node->data.string, BOTH_NOTFIND);
+        if (0 == strcasecmp(elem_1, node->data.string))
+        {
+            printf("%s is defined\n", elem_1);
+            return FIRST_FIND;
+        }
+
+        CHECK(NULL != node->data.string, false);
+        if (0 == strcasecmp(elem_2, node->data.string))
+        {
+            printf("%s is defined\n", elem_2);
+            return SECOND_FIND;
+        }
+    }
+
+    return BOTH_NOTFIND;
+}
+/*)---------------------------------------------------------------------------*/
 /*)===========================================================================*/

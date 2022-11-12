@@ -18,8 +18,16 @@
 {
 "2nd year student"
 "Max"
+{
+"loved by Maxim"
+"Tuzya"
 "StASS"
 }
+}
+{
+"MEPhIst"
+"Ivan Doronin"
 "ded32"
+}
 }
 }

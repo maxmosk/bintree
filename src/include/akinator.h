@@ -30,6 +30,14 @@ enum CODES
     NO_MEMORY_ERROR = 7
 };
 
+enum DEF_CODES
+{
+    BOTH_NOTFIND = 0,
+    BOTH_FIND    = 1,
+    FIRST_FIND   = 2,
+    SECOND_FIND  = 3
+};
+
 
 enum CODES play(void);
 
