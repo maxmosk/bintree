@@ -23,6 +23,10 @@ static char *parsedata(tree_t *dest, treeNode_t *node, char *src);
 static void savedata(FILE *file, treeNode_t *subtree);
 
 static char *getresp(void);
+
+static enum CODES definition(tree_t *data);
+
+static bool definition_rec(const treeNode_t *node, const char *elem);
 /*)===========================================================================*/
 
 
@@ -44,7 +48,10 @@ enum CODES play(void)
         }
             break;
         case DEFINITION:
-
+        {
+            enum CODES status = definition(&database);
+            CHECK(SUCCESS == status, status);
+        }
             break;
         case DIFFERENCE:
 
@@ -134,6 +141,7 @@ static enum CODES akinator(tree_t *data)
     }
     else if (resp == 'n')
     {
+        while (getchar() != '\n') { ; }
         enum CODES status = unknowen(data, node);
         CHECK(SUCCESS == status, status);
     }
@@ -152,7 +160,6 @@ static enum CODES unknowen(tree_t *data, treeNode_t *node)
 
     printf("But what is it? ");
 
-    while (getchar() != '\n') { ; }
     char *newdata = getresp();
     CHECK(NULL != newdata, NO_MEMORY_ERROR);
 
@@ -304,5 +311,62 @@ static char *getresp(void)
     }
 
     return data;
+}
+
+static enum CODES definition(tree_t *data)
+{
+    CHECK(NULL != data, NULLPTR_ERROR);
+
+    printf("Input some to define: ");
+
+    while (getchar() != '\n') { ; }
+    char *lookdata = getresp();
+    CHECK(NULL != lookdata, NO_MEMORY_ERROR);
+
+    if (!definition_rec(data->root, lookdata))
+    {
+        printf("%s is undefined!\n", lookdata);
+    }
+    else
+    {
+        putchar('\n');
+    }
+
+    return SUCCESS;
+}
+
+static bool definition_rec(const treeNode_t *node, const char *elem)
+{
+    CHECK(NULL != node, false);
+    CHECK(NULL != elem, false);
+
+    if ((NULL != node->left) && (NULL != node->right))
+    {
+        if (definition_rec(node->left, elem))
+        {
+            printf(", %s", node->data.string);
+            return true;
+        }
+        else if (definition_rec(node->right, elem))
+        {
+            printf(", not %s", node->data.string);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else
+    {
+        CHECK(NULL != node->data.string, false);
+        if (0 == strcasecmp(elem, node->data.string))
+        {
+            printf("%s is defined", elem);
+            return true;
+        }
+    }
+
+    return false;
 }
 /*)===========================================================================*/
