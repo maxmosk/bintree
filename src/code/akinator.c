@@ -3,6 +3,21 @@
 
 
 /*(===========================================================================*/
+#define SPEAK(...)                                      \
+do                                                       \
+{                                                         \
+    char buffer_[256] = "";                                \
+    sprintf(buffer_, __VA_ARGS__);                          \
+    printf("%s", buffer_);                                   \
+    char cmdbuffer_[300] = "";                                \
+    sprintf(cmdbuffer_, "echo '%s' | festival --tts", buffer_);\
+    system(cmdbuffer_);                                         \
+}                                                                \
+while (0)
+/*)===========================================================================*/
+
+
+/*(===========================================================================*/
 const char *databasefile = "../data.txt";
 /*)===========================================================================*/
 
@@ -68,7 +83,7 @@ enum CODES play(void)
 
         case MODE_ERROR:
         default:
-            printf("Undefined mode\n");
+            SPEAK("Undefined mode\n");
             CHECK(TREE_SUCCESS == treeDtor(&database), TREE_OPS_ERROR);
             free(datatext);
             return WRONG_MODE;
@@ -87,10 +102,10 @@ enum CODES play(void)
 /*(---------------------------------------------------------------------------*/
 static enum MODES getmode(void)
 {
-    printf("Please, choose mode:\n");
-    printf("(1) Akinator;\n");
-    printf("(2) Definition;\n");
-    printf("(3) Difference;\n");
+    SPEAK("Please, choose mode:\n");
+    SPEAK("(1) Akinator;\n");
+    SPEAK("(2) Definition;\n");
+    SPEAK("(3) Difference;\n");
 
     int resp = EOF;
     while (EOF != (resp = getchar()))
@@ -121,7 +136,7 @@ static enum CODES akinator(tree_t *data)
     treeNode_t *node = data->root;
     while ((NULL != node->left) && (NULL != node->right))
     {
-        printf("It is %s? ", node->data.string);
+        SPEAK("It is %s? ", node->data.string);
 
         int resp = '\0';
         do
@@ -140,7 +155,7 @@ static enum CODES akinator(tree_t *data)
         }
     }
 
-    printf("It is %s? ", node->data.string);
+    SPEAK("It is %s? ", node->data.string);
     int resp = '\0';
     do
     {
@@ -150,7 +165,7 @@ static enum CODES akinator(tree_t *data)
 
     if (resp == 'y')
     {
-        printf("I said...\n");
+        SPEAK("I said...\n");
     }
     else if (resp == 'n')
     {
@@ -173,12 +188,12 @@ static enum CODES unknowen(tree_t *data, treeNode_t *node)
 {
     CHECK(NULL != data, NULLPTR_ERROR);
 
-    printf("But what is it? ");
+    SPEAK("But what is it? ");
 
     char *newdata = getresp();
     CHECK(NULL != newdata, NO_MEMORY_ERROR);
 
-    printf("What is the difference between %s and %s in all? ", newdata, node->data.string);
+    SPEAK("What is the difference between %s and %s in all? ", newdata, node->data.string);
 
     char *olddata = node->data.string;
     node->data.string = getresp();
@@ -346,7 +361,7 @@ static enum CODES definition(tree_t *data)
 
     while (getchar() != '\n') { ; }
 
-    printf("Input some to define: ");
+    SPEAK("Input some to define: ");
     char *lookdata = getresp();
     CHECK(NULL != lookdata, NO_MEMORY_ERROR);
 
@@ -356,7 +371,7 @@ static enum CODES definition(tree_t *data)
     }
     else
     {
-        printf("%s is undefined!\n", lookdata);
+        SPEAK("%s is undefined!\n", lookdata);
     }
 
     return SUCCESS;
@@ -373,12 +388,12 @@ static bool definition_rec(const treeNode_t *node, const char *elem)
     {
         if (definition_rec(node->left, elem))
         {
-            printf(", %s", node->data.string);
+            SPEAK(", %s", node->data.string);
             return true;
         }
         else if (definition_rec(node->right, elem))
         {
-            printf(", not %s", node->data.string);
+            SPEAK(", not %s", node->data.string);
             return true;
         }
         else
@@ -391,7 +406,7 @@ static bool definition_rec(const treeNode_t *node, const char *elem)
         CHECK(NULL != node->data.string, false);
         if (0 == strcasecmp(elem, node->data.string))
         {
-            printf("%s is defined", elem);
+            SPEAK("%s is defined", elem);
             return true;
         }
     }
@@ -407,11 +422,11 @@ static enum CODES difference(tree_t *data)
 
     while (getchar() != '\n') { ; }
 
-    printf("Input 1-st element to compare: ");
+    SPEAK("Input 1-st element to compare: ");
     char *elem_1 = getresp();
     CHECK(NULL != elem_1, NO_MEMORY_ERROR);
 
-    printf("Input 2-nd element to compare: ");
+    SPEAK("Input 2-nd element to compare: ");
     char *elem_2 = getresp();
     CHECK(NULL != elem_2, NO_MEMORY_ERROR);
 
@@ -437,26 +452,26 @@ difference_rec(const treeNode_t *node, const char *elem_1, const char *elem_2)
 
         if (BOTH_FIND == left)
         {
-            printf("But %s and %s both are %s\n", elem_1, elem_2, node->data.string);
+            SPEAK("But %s and %s both are %s\n", elem_1, elem_2, node->data.string);
         }
         else if (BOTH_FIND == right)
         {
-            printf("But %s and %s both are not %s\n", elem_1, elem_2, node->data.string);
+            SPEAK("But %s and %s both are not %s\n", elem_1, elem_2, node->data.string);
         }
         else if ((BOTH_NOTFIND != right) && (BOTH_NOTFIND != left))
         {
             const char *fortrue  = (FIRST_FIND == left) ? elem_1 : elem_2;
             const char *forfalse = (FIRST_FIND == left) ? elem_2 : elem_1;
-            printf("But %s is %s and %s is not %s\n",
+            SPEAK("But %s is %s and %s is not %s\n",
                     fortrue, node->data.string, forfalse, node->data.string);
         }
         else if (BOTH_NOTFIND != left)
         {
-            printf("- is %s\n", node->data.string);
+            SPEAK("- is %s\n", node->data.string);
         }
         else if (BOTH_NOTFIND != right)
         {
-            printf("- is not %s\n", node->data.string);
+            SPEAK("- is not %s\n", node->data.string);
         }
 
         if ((BOTH_FIND == left) || (BOTH_FIND == right) ||
@@ -482,14 +497,14 @@ difference_rec(const treeNode_t *node, const char *elem_1, const char *elem_2)
         CHECK(NULL != node->data.string, BOTH_NOTFIND);
         if (0 == strcasecmp(elem_1, node->data.string))
         {
-            printf("%s is defined\n", elem_1);
+            SPEAK("%s is defined\n", elem_1);
             return FIRST_FIND;
         }
 
         CHECK(NULL != node->data.string, false);
         if (0 == strcasecmp(elem_2, node->data.string))
         {
-            printf("%s is defined\n", elem_2);
+            SPEAK("%s is defined\n", elem_2);
             return SECOND_FIND;
         }
     }

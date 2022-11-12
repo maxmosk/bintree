@@ -2,16 +2,8 @@
 "animal"
 {
 "cute"
-{
-"not cute"
-"cat"
 "poltorash"
-}
-{
-"good with beer"
-"fish"
 "pystech.dog"
-}
 }
 {
 "true gachi boy"
