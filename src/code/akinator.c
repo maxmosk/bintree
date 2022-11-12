@@ -422,11 +422,11 @@ static enum CODES difference(tree_t *data)
 
     while (getchar() != '\n') { ; }
 
-    SPEAK("Input 1-st element to compare: ");
+    SPEAK("Input 1st element to compare: ");
     char *elem_1 = getresp();
     CHECK(NULL != elem_1, NO_MEMORY_ERROR);
 
-    SPEAK("Input 2-nd element to compare: ");
+    SPEAK("Input 2nd element to compare: ");
     char *elem_2 = getresp();
     CHECK(NULL != elem_2, NO_MEMORY_ERROR);
 
